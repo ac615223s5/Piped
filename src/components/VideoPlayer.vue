@@ -328,7 +328,12 @@ export default {
             if (this.video.livestream) {
                 uri = this.video.hls;
                 mime = "application/x-mpegURL";
-            } else if (this.video.audioStreams.length > 0 && !lbry && MseSupport) {
+            } else if (
+                this.video.audioStreams.length > 0 &&
+                !lbry &&
+                MseSupport &&
+                !this.getPreferenceBoolean("preferHls", false)
+            ) {
                 if (!this.video.dash) {
                     const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
                         streams,
@@ -954,6 +959,10 @@ export default {
 .shaka-text-wrapper > span > span *:first-child:last-child {
     background-color: rgba(0, 0, 0, 0.6) !important;
     padding: 0.09em 0;
+}
+
+#shaka-player-ui-time-container {
+    display: none !important;
 }
 
 .skip-segment-button {
