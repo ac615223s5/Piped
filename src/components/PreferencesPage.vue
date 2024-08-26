@@ -436,7 +436,7 @@ export default {
             showMarkers: true,
             minSegmentLength: 0,
             dearrow: false,
-            selectedTheme: "dark",
+            selectedTheme: "auto",
             autoPlayVideo: true,
             autoDisplayCaptions: false,
             autoPlayNextCountdown: 5,
@@ -557,7 +557,7 @@ export default {
             this.showMarkers = this.getPreferenceBoolean("showMarkers", true);
             this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
             this.dearrow = this.getPreferenceBoolean("dearrow", false);
-            this.selectedTheme = this.getPreferenceString("theme", "dark");
+            this.selectedTheme = this.getPreferenceString("theme", "auto");
             this.autoPlayVideo = this.getPreferenceBoolean("playerAutoPlay", true);
             this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
             this.autoPlayNextCountdown = this.getPreferenceNumber("autoPlayNextCountdown", 5);
@@ -598,7 +598,7 @@ export default {
                 var shouldReload = false;
 
                 if (
-                    this.getPreferenceString("theme", "dark") !== this.selectedTheme ||
+                    this.getPreferenceString("theme", "auto") !== this.selectedTheme ||
                     this.getPreferenceBoolean("watchHistory", false) != this.watchHistory ||
                     this.getPreferenceString("hl", await this.defaultLanguage) !== this.selectedLanguage ||
                     this.getPreferenceString("enabledCodecs", "vp9,avc") !== this.enabledCodecs.join(",")

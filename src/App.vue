@@ -112,7 +112,7 @@ export default {
     },
     methods: {
         setTheme() {
-            let themePref = this.getPreferenceString("theme", "dark"); // dark, light or auto
+            let themePref = this.getPreferenceString("theme", "auto"); // dark, light or auto
             const themes = {
                 dark: "dark",
                 light: "light",
