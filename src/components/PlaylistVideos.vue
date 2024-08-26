@@ -56,7 +56,7 @@
                     <span class="text-sm font-semibold leading-4" :title="related.title" v-text="related.title" />
                     <div class="flex-1">
                         <router-link
-                            v-if="related.uploaderUrl && related.uploaderName && !hideChannel"
+                            v-if="related.uploaderUrl && related.uploaderName"
                             class="link-secondary block overflow-hidden text-xs"
                             :to="related.uploaderUrl"
                             :title="related.uploaderName"
