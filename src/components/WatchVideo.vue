@@ -136,7 +136,7 @@
                             <i class="i-fa6-solid:share mx-1.5" />
                         </button>
                         <!-- YouTube -->
-                        <WatchOnButton :link="`https://youtu.be/${getVideoId()}?t=${Math.round(currentTime)}`" />
+                        <WatchOnButton :link="`https://youtu.be/${getVideoId()}?t=${Math.round(currentTime)}&list=${playlistId||''}`" />
                         <!-- Odysee -->
                         <WatchOnButton
                             v-if="video.lbryId"
