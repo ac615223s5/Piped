@@ -729,6 +729,7 @@ export default {
                 }
             // save the fullscreen state
             searchParams.set("fullscreen", this.$refs.videoPlayer.$ui.getControls().isFullScreenEnabled());
+            searchParams.set("play", true);
             const paramStr = searchParams.toString();
             if (paramStr.length > 0) url += "&" + paramStr;
             this.$router.push(url);

@@ -532,9 +532,7 @@ export default {
                         buffered: "var(--player-buffered)",
                         played: "var(--player-played)",
                     },
-                    playbackRates: [
-                        0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.3, 3.6, 4
-                    ],
+                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.3, 3.6, 4],
                 };
 
                 this.$ui.configure(config);
@@ -696,6 +694,9 @@ export default {
                             this.$player.setTextTrackVisibility(true);
                             this.$player.selectTextTrack(textTracks[subtitleIdx]);
                         }
+                    }
+                    if (this.$route.query.play === "true" && videoEl.paused) {
+                        videoEl.play();
                     }
                 })
                 .catch(e => {
