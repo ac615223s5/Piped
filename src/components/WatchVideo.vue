@@ -418,6 +418,9 @@ export default {
         purifiedDescription() {
             return purifyHTML(this.video.description);
         },
+        equivalentYoutubeLink() {
+            return `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}${this.playlistId ? `&list=${this.playlistId}` : ""}`;
+        },
     },
     mounted() {
         // check screen size
