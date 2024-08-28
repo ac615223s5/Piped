@@ -136,9 +136,7 @@
                             <i class="i-fa6-solid:share mx-1.5" />
                         </button>
                         <!-- YouTube -->
-                        <WatchOnButton
-                            :link="`https://youtu.be/${getVideoId()}?t=${Math.round(currentTime)}&list=${playlistId || ''}`"
-                        />
+                        <WatchOnButton :link="equivalentYoutubeLink" />
                         <!-- Odysee -->
                         <WatchOnButton
                             v-if="video.lbryId"
@@ -364,6 +362,9 @@ export default {
         },
         purifiedDescription() {
             return purifyHTML(this.video.description);
+        },
+        equivalentYoutubeLink() {
+            return `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}${(this.playlistId && `&list=${this.playlistId}`) || ""}`;
         },
     },
     mounted() {
