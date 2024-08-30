@@ -199,9 +199,9 @@ export default {
                             e.preventDefault();
                             break;
                         case "ctrl+left": {
-                            videoEl.currentTime = self.video.chapters.findLast(
-                                chapter => chapter.start < videoEl.currentTime,
-                            ).start;
+                            videoEl.currentTime =
+                                self.video.chapters.findLast(chapter => chapter.start < videoEl.currentTime)?.start ||
+                                0;
                             e.preventDefault();
                             break;
                         }
