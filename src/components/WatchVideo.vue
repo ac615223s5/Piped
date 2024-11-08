@@ -416,8 +416,10 @@ export default {
         purifiedDescription() {
             return purifyHTML(this.video.description);
         },
-        equivalentYoutubeLink() {
-            return `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}${this.playlistId ? `&list=${this.playlistId}` : ""}`;
+        youtubeVideoHref() {
+            let link = `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}`;
+            if (this.playlistId) link += `&list=${this.playlistId}`;
+            return link;
         },
     },
     mounted() {

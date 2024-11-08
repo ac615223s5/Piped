@@ -21,7 +21,7 @@
     },
     "player": {
         "watch_on": "Посмотреть на {0}",
-        "failed": "Ошибка с кодом {0}, откройте логи, чтобы узнать больше"
+        "failed": "Ошибка с кодом {0}. Откройте логи, чтобы узнать больше."
     },
     "actions": {
         "subscribe": "Подписаться",
@@ -50,7 +50,7 @@
         "audio_only": "Только звук",
         "default_quality": "Качество по умолчанию",
         "buffering_goal": "Размер буфера видео (в секундах)",
-        "country_selection": "Выбор страны (для трендов)",
+        "country_selection": "Страна/Регион",
         "default_homepage": "По умолчанию открывать",
         "show_comments": "Показывать комментарии",
         "minimize_description_default": "Свернуть описание по умолчанию",
@@ -65,7 +65,7 @@
         "export_to_json": "Экспорт в JSON",
         "import_from_json": "Импорт из JSON",
         "loop_this_video": "Повтор текущего видео",
-        "auto_play_next_video": "Сразу проигрывать следующее рекомендованное видео",
+        "auto_play_next_video": "Автовоспроизведение следующего видео",
         "donations": "Пожертвования на разработку",
         "minimize_description": "Свернуть описание",
         "show_description": "Показать описание",
@@ -76,11 +76,11 @@
         "view_ssl_score": "Посмотреть настройки SSL",
         "search": "Поиск (Ctrl+K)",
         "filter": "Фильтр",
-        "loading": "Загрузка...",
+        "loading": "Загрузка…",
         "clear_history": "Очистить историю",
         "hide_replies": "Скрыть ответы",
         "load_more_replies": "Загрузить больше ответов",
-        "skip_highlight": "Пропускать главную мысль",
+        "skip_highlight": "Перейти к сути видео",
         "skip_filler_tangent": "Пропускать не относящееся к сути",
         "delete_playlist": "Удалить плейлист",
         "add_to_playlist": "Добавить в плейлист",
@@ -165,7 +165,7 @@
     },
     "comment": {
         "pinned_by": "Закреплено пользователем {author}",
-        "loading": "Загрузка комментариев...",
+        "loading": "Загрузка комментариев…",
         "user_disabled": "Комментарии отключены в настройках.",
         "disabled": "Комментарии отключены автором."
     },
