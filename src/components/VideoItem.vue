@@ -66,8 +66,18 @@
                         <i class="i-fa6-solid:eye" />
                         <span class="pl-1" v-text="`${numberFormat(item.views)} •`" />
                     </span>
-                    <span v-if="item.uploaded > 0" class="pl-0.5" v-text="timeAgo(item.uploaded)" />
-                    <span v-else-if="item.uploadedDate" class="pl-0.5" v-text="item.uploadedDate" />
+                    <span
+                        v-if="item.uploaded > 0"
+                        class="pl-0.5"
+                        :title="formatTime(item.uploaded)"
+                        v-text="timeAgo(item.uploaded)"
+                    />
+                    <span
+                        v-else-if="item.uploadedDate"
+                        class="pl-0.5"
+                        :title="formatTime(item.uploadedDate)"
+                        v-text="item.uploadedDate"
+                    />
                 </div>
             </div>
 

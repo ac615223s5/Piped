@@ -136,6 +136,17 @@ const mixin = {
         timeAgo(time) {
             return timeAgo.format(time);
         },
+        formatTime(time) {
+            return new Date(time).toLocaleString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+            });
+        },
         async updateWatched(videos) {
             if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
                 var tx = window.db.transaction("watch_history", "readonly");
