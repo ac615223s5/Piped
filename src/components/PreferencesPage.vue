@@ -532,7 +532,7 @@ export default {
         this.fetchInstances();
 
         if (this.testLocalStorage) {
-            this.selectedInstance = this.getPreferenceString("instance", import.meta.env.VITE_PIPED_API);
+            this.selectedInstance = this.getPreferenceString("instance", "https://pipedapi.stellar.afs.ovh");
             this.authInstance = this.getPreferenceBoolean("authInstance", false);
             this.selectedAuthInstance = this.getPreferenceString("auth_instance_url", this.selectedInstance);
 
@@ -652,7 +652,7 @@ export default {
         async fetchInstances() {
             this.customInstances = this.getCustomInstances();
 
-            this.fetchJson(import.meta.env.VITE_PIPED_INSTANCES).then(resp => {
+            this.fetchJson("https://piped-instances.kavin.rocks/").then(resp => {
                 this.publicInstances = resp;
                 if (!this.publicInstances.some(instance => instance.api_url == this.apiUrl()))
                     this.publicInstances.push({
