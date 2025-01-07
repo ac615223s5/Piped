@@ -13,7 +13,7 @@
         >
             <canvas id="preview" ref="preview" class="rounded-sm" />
             <span
-                v-if="video.chapters.length > 1"
+                v-if="(video?.chapters?.length ?? 0) > 1"
                 class="mt-2 text-sm drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black]"
             >
                 {{ video.chapters.findLast(chapter => chapter.start < currentTime)?.title }}
@@ -610,16 +610,11 @@ export default {
                 .then(() => {
                     const isSafari = window.navigator?.vendor?.includes("Apple");
 
+                    let lang = "en";
                     if (!isSafari) {
                         // Set the audio language
                         const prefLang = this.getPreferenceString("hl", "en").substr(0, 2);
-                        var lang = "en";
-                        for (var l in player.getAudioLanguages()) {
-                            if (l == prefLang) {
-                                lang = l;
-                                return;
-                            }
-                        }
+                        if (player.getAudioLanguages().includes(prefLang)) lang = prefLang;
                         player.selectAudioLanguage(lang);
                     }
 
