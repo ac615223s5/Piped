@@ -94,7 +94,7 @@ export default {
                 return {};
             },
         },
-        selectedAutoPlay: Boolean,
+        selectedAutoPlay: Number,
         selectedAutoLoop: Boolean,
         isEmbed: Boolean,
     },
@@ -870,6 +870,7 @@ export default {
         },
         // ineffective algorithm to find the thumbnail corresponding to the currently hovered position in the video
         getFrame(position) {
+            console.log(1,this.video);
             let startPosition = 0;
             const framePage = this.video.previewFrames.at(-1);
             for (let i = 0; i < framePage.urls.length; i++) {
