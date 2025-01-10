@@ -128,7 +128,7 @@
         "piped_link": "Piped link",
         "follow_link": "Follow link",
         "copy_link": "Copy link",
-        "time_code": "Time code (in seconds)",
+        "time_code": "Time code (in seconds or HH:MM:SS)",
         "show_chapters": "Chapters",
         "store_search_history": "Store Search History",
         "hide_watched": "Hide watched videos in the feed",
@@ -163,7 +163,16 @@
         "creator_liked": "Creator liked",
         "playback_speed": "Playback speed",
         "invalid_input": "Invalid input",
-        "prefer_hls": "Prefer HLS over DASH"
+        "prefer_hls": "Prefer HLS over DASH",
+        "export_history": "Export history",
+        "import_history": "Import history",
+        "file_format": "File format",
+        "override": "Override",
+        "import": "Import",
+        "export": "Export",
+        "never": "Never",
+        "playlists_only": "Playlists only",
+        "always": "Always"
     },
     "comment": {
         "pinned_by": "Pinned by {author}",
@@ -232,6 +241,11 @@
         "weeks": "{amount} week(s)",
         "months": "{amount} month(s)",
         "register_note": "Register an account for this Piped instance. This will allow you to sync your subscriptions and playlists with your account, so they're stored on the server side. You can use all features without an account, but all data will be stored in your browser's local cache. Please make sure you do NOT use an email address as your username and choose a secure password that you do not use elsewhere.",
-        "login_note": "Log in with an account created on this instance."
+        "login_note": "Log in with an account created on this instance.",
+        "found_n_items": "Found {0} items",
+        "success": "Success",
+        "error": "Error",
+        "skipped": "Skipped",
+        "selected_subscriptions": "Selected subscriptions"
     }
 }

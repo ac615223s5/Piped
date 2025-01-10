@@ -99,7 +99,7 @@
         "restore_preferences": "Beállítások betöltése fájlból",
         "instance_donations": "Példány adományozások",
         "piped_link": "Piped hivatkozás",
-        "time_code": "Idő kód (másodpercekben)",
+        "time_code": "Időkód (másodpercekben vagy óó:pp:mp )",
         "show_chapters": "Fejezetek",
         "download_as_txt": "Letöltés szövegdokumentumként",
         "source_code": "Forráskód",
@@ -111,7 +111,7 @@
         "confirm_reset_preferences": "Biztos, hogy vissza szeretné állítani a beállításait?",
         "backup_preferences": "Beállítások mentése",
         "share": "Megosztás",
-        "with_timecode": "Megosztás & videó kezdés ettől a ponttól",
+        "with_timecode": "Megosztás időkóddal",
         "store_search_history": "Keresési előzmények tárolása",
         "follow_link": "Hivatkozások követése",
         "copy_link": "Hivatkozás másolása",
@@ -159,7 +159,16 @@
         "invalid_input": "Érvénytelen bevitel",
         "prefer_hls": "HLS előnyben részesítése DASH helyett",
         "mark_as_unwatched": "Jelölés nem megtekintettnek",
-        "mark_as_watched": "Jelölés megtekintettnek"
+        "mark_as_watched": "Jelölés megtekintettnek",
+        "export_history": "Előzmények exportálása",
+        "import_history": "Előzmények importálása",
+        "file_format": "Fájlformátum",
+        "override": "Felülbírálás",
+        "import": "Importálás",
+        "export": "Exportálás",
+        "playlists_only": "Csak lejátszási listák",
+        "always": "Mindig",
+        "never": "Soha"
     },
     "video": {
         "ratings_disabled": "Értékelések letiltva",
@@ -232,6 +241,11 @@
         "months": "{amount} hónap",
         "hours": "{amount} óra",
         "days": "{amount} nap",
-        "register_note": "Regisztráljon egy fiókot ehhez a Piped példányhoz. Ez lehetővé teszi az előfizetések és lejátszási listák szinkronizálását a fiókjával, így azok a kiszolgálói oldalon kerülnek tárolásra. Az összes funkciót fiók nélkül is használhatja, de minden adat a böngésző helyi gyorsítótárában tárolódik. Győződjön meg arról, hogy NE használjon e-mail-címet felhasználónévként, és válasszon egy biztonságos jelszót, amelyet máshol nem használ."
+        "register_note": "Regisztráljon egy fiókot ehhez a Piped példányhoz. Ez lehetővé teszi az előfizetések és lejátszási listák szinkronizálását a fiókjával, így azok a kiszolgálói oldalon kerülnek tárolásra. Az összes funkciót fiók nélkül is használhatja, de minden adat a böngésző helyi gyorsítótárában tárolódik. Győződjön meg arról, hogy NE használjon e-mail-címet felhasználónévként, és válasszon egy biztonságos jelszót, amelyet máshol nem használ.",
+        "skipped": "Kihagyott",
+        "success": "Sikeres",
+        "selected_subscriptions": "Kiválasztott feliratkozások",
+        "found_n_items": "{0} elemet talált",
+        "error": "Hiba"
     }
 }

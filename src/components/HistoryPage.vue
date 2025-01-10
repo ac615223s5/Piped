@@ -1,15 +1,16 @@
 <template>
-    <h1 v-t="'titles.history'" class="mb-3 text-center font-bold" />
+    <h1 v-t="'titles.history'" class="my-2 mb-3 text-center font-bold" />
 
-    <div class="flex">
+    <div class="flex justify-between">
         <div class="flex flex-col gap-2 md:flex-row md:items-center">
             <button v-t="'actions.clear_history'" class="btn" @click="clearHistory" />
 
-            <button v-t="'actions.export_to_json'" class="btn" @click="exportHistory" />
+            <button v-t="'actions.export_history'" class="btn" @click="showExportModal = !showExportModal" />
+            <button v-t="'actions.import_history'" class="btn" @click="showImportModal = !showImportModal" />
+        </div>
 
-            <div class="ml-auto flex items-center gap-1">
-                <SortingSelector by-key="watchedAt" @apply="order => videos.sort(order)" />
-            </div>
+        <div class="flex items-center gap-1">
+            <SortingSelector by-key="watchedAt" @apply="order => videos.sort(order)" />
         </div>
 
         <div class="ml-4 flex items-center">
@@ -37,22 +38,33 @@
     </div>
 
     <br />
+    <ExportHistoryModal v-if="showExportModal" @close="showExportModal = false" />
+    <ImportHistoryModal v-if="showImportModal" @close="showImportModal = false" />
 </template>
 
 <script>
 import VideoItem from "./VideoItem.vue";
 import SortingSelector from "./SortingSelector.vue";
+import ExportHistoryModal from "./ExportHistoryModal.vue";
+import ImportHistoryModal from "./ImportHistoryModal.vue";
 
 export default {
     components: {
         VideoItem,
         SortingSelector,
+        ExportHistoryModal,
+        ImportHistoryModal,
     },
     data() {
         return {
+            currentVideoCount: 0,
+            videoStep: 100,
+            videosStore: [],
             videos: [],
             autoDeleteHistory: false,
             autoDeleteDelayHours: "24",
+            showExportModal: false,
+            showImportModal: false,
         };
     },
     mounted() {
@@ -64,33 +76,43 @@ export default {
                 var tx = window.db.transaction("watch_history", "readwrite");
                 var store = tx.objectStore("watch_history");
                 const cursorRequest = store.index("watchedAt").openCursor(null, "prev");
-                cursorRequest.onsuccess = e => {
-                    const cursor = e.target.result;
-                    if (cursor) {
-                        const video = cursor.value;
-                        if (this.videos.length < 1000) cursor.continue();
-                        if (!this.shouldRemoveVideo(video)) {
-                            this.videos.push({
-                                url: "/watch?v=" + video.videoId,
-                                title: video.title,
-                                uploaderName: video.uploaderName,
-                                uploaderUrl: video.uploaderUrl,
-                                duration: video.duration,
-                                thumbnail: video.thumbnail,
-                                watchedAt: video.watchedAt,
-                                watched: true,
-                                currentTime: video.currentTime,
-                            });
-                        } else {
-                            store.delete(video.videoId);
-                        }
-                    }
-                };
+                const cursorPromise = new Promise(resolve => {
+                    cursorRequest.onsuccess = e => {
+                        const cursor = e.target.result;
+                        if (cursor) {
+                            const video = cursor.value;
+                            if (!this.shouldRemoveVideo(video)) {
+                                this.videosStore.push({
+                                    url: "/watch?v=" + video.videoId,
+                                    title: video.title,
+                                    uploaderName: video.uploaderName,
+                                    uploaderUrl: video.uploaderUrl ?? "", // Router doesn't like undefined
+                                    duration: video.duration ?? 0, // Undefined duration shows "Live"
+                                    thumbnail: video.thumbnail,
+                                    watchedAt: video.watchedAt,
+                                    watched: true,
+                                    currentTime: video.currentTime,
+                                });
+                            } else {
+                                store.delete(video.videoId);
+                            }
+                            if (this.videosStore.length < 1000) cursor.continue();
+                            else resolve();
+                        } else resolve();
+                    };
+                });
+                await cursorPromise;
             }
-        })();
+        })().then(() => {
+            this.loadMoreVideos();
+        });
     },
     activated() {
         document.title = "Watch History - Piped";
+        window.addEventListener("scroll", this.handleScroll);
+    },
+    deactivated() {
+        window.removeEventListener("scroll", this.handleScroll);
     },
     methods: {
         clearHistory() {
@@ -101,22 +123,6 @@ export default {
             }
             this.videos = [];
         },
-        exportHistory() {
-            const dateStr = new Date().toISOString().split(".")[0];
-            let json = {
-                format: "Piped",
-                version: 1,
-                playlists: [
-                    {
-                        name: `Piped History ${dateStr}`,
-                        type: "history",
-                        visibility: "private",
-                        videos: this.videos.map(video => "https://youtube.com" + video.url),
-                    },
-                ],
-            };
-            this.download(JSON.stringify(json), `piped_history_${dateStr}.json`, "application/json");
-        },
         onChange() {
             this.setPreference("autoDeleteWatchHistory", this.autoDeleteHistory);
             this.setPreference("autoDeleteWatchHistoryDelayHours", this.autoDeleteDelayHours);
@@ -126,6 +132,16 @@ export default {
             // convert from hours to milliseconds
             let maximumTimeDiff = Number(this.autoDeleteDelayHours) * 60 * 60 * 1000;
             return Date.now() - video.watchedAt > maximumTimeDiff;
+        },
+        loadMoreVideos() {
+            this.currentVideoCount = Math.min(this.currentVideoCount + this.videoStep, this.videosStore.length);
+            if (this.videos.length != this.videosStore.length)
+                this.videos = this.videosStore.slice(0, this.currentVideoCount);
+        },
+        handleScroll() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - window.innerHeight) {
+                this.loadMoreVideos();
+            }
         },
     },
 };
