@@ -1,7 +1,7 @@
 <template>
     <div v-if="showVideo" class="flex flex-col flex-justify-between">
         <router-link
-            class="inline-block w-full focus:underline hover:underline"
+            class="link inline-block w-full"
             :to="{
                 path: '/watch',
                 query: {
@@ -61,7 +61,7 @@
                     <i v-if="item.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
                 </router-link>
 
-                <div v-if="item.views >= 0 || item.uploadedDate" class="mt-1 text-xs text-gray-300 font-normal">
+                <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
                     <span v-if="item.views >= 0">
                         <i class="i-fa6-solid:eye" />
                         <span class="pl-1" v-text="`${numberFormat(item.views)} •`" />
