@@ -1,5 +1,5 @@
 <template>
-    <ModalComponent @close="$emit('close')">
+    <ModalComponent v-show="show" @close="$emit('close')">
         <div class="flex flex-col">
             <h2 v-t="'actions.create_playlist'" />
             <input ref="input" v-model="playlistName" type="text" class="input mt-2" />
@@ -22,6 +22,7 @@ export default {
     data() {
         return {
             playlistName: "New Playlist " + Math.floor(Math.random() * 1000),
+            show: true,
         };
     },
     mounted() {
@@ -45,9 +46,10 @@ export default {
                 if (response.error) alert(response.error);
                 else {
                     this.$emit("created", response.playlistId, this.playlistName);
+                    this.$emit("close");
                 }
             });
-            this.$emit("close");
+            this.show = false;
         },
     },
 };
