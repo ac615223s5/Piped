@@ -21,7 +21,7 @@ export default {
     emits: ["created", "close"],
     data() {
         return {
-            playlistName: "New Playlist "+Math.floor(Math.random()*1000),
+            playlistName: "New Playlist " + Math.floor(Math.random() * 1000),
         };
     },
     mounted() {
