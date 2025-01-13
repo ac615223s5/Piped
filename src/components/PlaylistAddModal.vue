@@ -84,10 +84,10 @@ export default {
             this.processing = true;
 
             this.addVideosToPlaylist(playlistId, [this.videoId], [this.videoInfo]).then(json => {
-                this.setPreference("selectedPlaylist" + this.hashCode(this.authApiUrl()), playlistId);
-                this.$emit("close");
                 if (json.error) alert(json.error);
             });
+            this.setPreference("selectedPlaylist" + this.hashCode(this.authApiUrl()), playlistId);
+            this.$emit("close");
         },
         addCreatedPlaylist(playlistId, playlistName) {
             this.playlists.push({ id: playlistId, name: playlistName });
