@@ -47,7 +47,10 @@
                     <i v-if="item.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
                 </router-link>
 
-                <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
+                <div
+                    v-if="item.views >= 0 || item.uploadedDate"
+                    class="mt-1 text-xs text-gray-600 font-normal .dark:text-gray-400"
+                >
                     <span v-if="item.views >= 0">
                         <i class="i-fa6-solid:eye" />
                         <span class="pl-1" v-text="`${numberFormat(item.views)} •`" />
@@ -237,13 +240,3 @@ export default {
     },
 };
 </script>
-
-<style>
-.video-info {
-    @apply mt-1 text-xs text-gray-600 font-normal;
-}
-
-.dark .video-info {
-    @apply text-gray-400;
-}
-</style>

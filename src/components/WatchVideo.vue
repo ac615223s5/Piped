@@ -17,7 +17,7 @@
                 <i18n-t keypath="info.next_video_countdown">{{ counter }}</i18n-t>
             </ToastComponent>
         </Transition>
-        <div class="flex gap-5 max-lg:flex-col">
+        <div class="flex gap-5">
             <div class="flex-auto">
                 <div v-show="!video.error">
                     <keep-alive>

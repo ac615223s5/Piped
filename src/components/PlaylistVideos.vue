@@ -22,7 +22,7 @@
             :prefer-listen="preferListen"
         >
             <router-link
-                class="flex rounded px-2 hover:bg-gray-50 .dark:hover:bg-neutral-800"
+                class="flex rounded hover:bg-gray-50 .dark:hover:bg-neutral-800"
                 :class="{ 'bg-gray-200 .dark:bg-neutral-700': index === selectedIndex - 1 }"
                 :to="{
                     path: '/watch',
@@ -34,7 +34,7 @@
                     },
                 }"
             >
-                <span class="min-w-5 flex-none text-xs" v-text="index + 1" />
+                <span class="min-w-5 flex-none px-0.5 text-center text-xs" v-text="index + 1" />
                 <div class="w-24 flex-none">
                     <VideoThumbnail :item="related" :small="true" />
                 </div>
