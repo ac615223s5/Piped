@@ -532,7 +532,7 @@ export default {
                         buffered: "var(--player-buffered)",
                         played: "var(--player-played)",
                     },
-                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.3, 3.6, 4],
+                    playbackRates: [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.33, 2.66, 3, 3.5, 4, 5, 6, 8, 10, 15, 20],
                 };
 
                 this.$ui.configure(config);
@@ -745,7 +745,7 @@ export default {
             }
         },
         adjustPlaybackSpeed(newSpeed) {
-            const normalizedSpeed = Math.min(4, Math.max(0.25, newSpeed));
+            const normalizedSpeed = Math.min(100, Math.max(0.1, newSpeed));
             this.$player.trickPlay(normalizedSpeed);
             if (this.hideCurrentSpeed) window.clearTimeout(this.hideCurrentSpeed);
             this.showCurrentSpeed = false;
