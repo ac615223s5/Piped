@@ -552,7 +552,6 @@ const mixin = {
                 Object.keys(json).forEach(videoId => {
                     const item = content.find(item => item.url.endsWith(videoId));
                     if (item) item.dearrow = json[videoId];
-                    console.log(item);
                 });
             });
         },
