@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
 
 COPY . .
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
 
 RUN --mount=type=cache,target=/root/.local/share/pnpm \
     --mount=type=cache,target=/app/node_modules \
