@@ -301,7 +301,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="video && !isMobile" class="max-w-96 flex-none">
+            <div v-if="video && !isMobile" class="max-w-88 flex-none">
                 <ChaptersBar
                     v-if="video?.chapters?.length > 0 && showChapters"
                     :mobile-layout="isMobile"
@@ -396,6 +396,7 @@ export default {
             timeoutCounter: null,
             counter: 0,
             wideVideo: true,
+            maxVideoHeight: 0,
         };
     },
     computed: {
@@ -433,10 +434,31 @@ export default {
     mounted() {
         // check screen size
         this.isMobile = window.innerWidth < 1024;
-        this.wideVideo = window.innerWidth < (window.innerHeight * 4) / 3 + 467; //if the video player is limited by width rather than height, then clear up some horizontal room
+        if (window.innerHeight > 1440 + 192) {
+            this.maxVideoHeight = 1440;
+        } else if (window.innerHeight > 1080 + 192) {
+            this.maxVideoHeight = 1080;
+        } else if (window.innerHeight > 720 + 192) {
+            this.maxVideoHeight = 720;
+        } else {
+            this.maxVideoHeight = (window.innerHeight * 3) / 4;
+        }
         // add an event listener to watch for screen size changes
         window.addEventListener("resize", () => {
             this.isMobile = window.innerWidth < 1024;
+            if (this.$refs.videoPlayer) {
+                if (window.innerHeight > 1440 + 192) {
+                    this.maxVideoHeight = 1440;
+                } else if (window.innerHeight > 1080 + 192) {
+                    this.maxVideoHeight = 1080;
+                } else if (window.innerHeight > 720 + 192) {
+                    this.maxVideoHeight = 720;
+                } else {
+                    this.maxVideoHeight = (window.innerHeight * 3) / 4;
+                }
+                this.$refs.videoPlayer.$el.nextElementSibling.style.maxHeight = this.maxVideoHeight + "px";
+                this.wideVideo = window.innerWidth < this.maxVideoHeight + 429;
+            }
         });
         this.getVideoData().then(() => {
             (async () => {
@@ -465,7 +487,11 @@ export default {
                     };
                 }
             })();
-            if (this.active) this.$refs.videoPlayer.loadVideo();
+            if (this.active) {
+                this.$refs.videoPlayer.loadVideo();
+                this.$refs.videoPlayer.$el.nextElementSibling.style.maxHeight = this.maxVideoHeight + "px";
+                this.wideVideo = window.innerWidth < this.maxVideoHeight + 429;
+            }
         });
         this.playlistId = this.$route.query.list;
         this.index = Number(this.$route.query.index);
