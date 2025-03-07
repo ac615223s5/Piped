@@ -729,7 +729,7 @@ export default {
             if (this.timeoutCounter) clearInterval(this.timeoutCounter);
             this.timeoutCounter = setInterval(() => {
                 this.counter--;
-                if (this.currentTime < this.video.duration - 1) {
+                if (this.$refs.videoPlayer.$player.isBuffering() || this.currentTime < this.video.duration - 1) {
                     this.dismiss();
                     return;
                 }
