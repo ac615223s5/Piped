@@ -585,6 +585,7 @@ export default {
                 .then(data => {
                     this.video = data;
                     this.video.id = this.getVideoId();
+                    this.video.duration += 1;
                 })
                 .then(() => {
                     if (!this.video.error) {
@@ -728,7 +729,7 @@ export default {
             if (this.timeoutCounter) clearInterval(this.timeoutCounter);
             this.timeoutCounter = setInterval(() => {
                 this.counter--;
-                if (this.currentTime < this.video.duration) {
+                if (this.currentTime < this.video.duration - 1) {
                     this.dismiss();
                     return;
                 }
