@@ -6,14 +6,8 @@
 </template>
 
 <script>
-import hotkeys from "hotkeys-js";
 export default {
     emits: ["dismissed"],
-    mounted() {
-        hotkeys("space", () => {
-            this.dismiss();
-        });
-    },
     methods: {
         dismiss() {
             this.$emit("dismissed");

@@ -728,6 +728,10 @@ export default {
             if (this.timeoutCounter) clearInterval(this.timeoutCounter);
             this.timeoutCounter = setInterval(() => {
                 this.counter--;
+                if (this.currentTime < this.video.duration) {
+                    this.dismiss();
+                    return;
+                }
                 if (this.counter === 0) {
                     this.dismiss();
                     this.navigateNext();
