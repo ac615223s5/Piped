@@ -538,6 +538,7 @@ export default {
                 };
 
                 this.$ui.configure(config);
+                videoEl.ui.configure({'customContextMenu' : true,'contextMenuElements' : ['statistics','loop','picture_in_picture','ad_statistics']})
             }
 
             this.updateMarkers();
