@@ -585,6 +585,7 @@ export default {
                 .then(data => {
                     this.video = data;
                     this.video.id = this.getVideoId();
+                    console.log(this.video.duration);
                     this.video.duration += 1;
                 })
                 .then(() => {
@@ -729,7 +730,7 @@ export default {
             if (this.timeoutCounter) clearInterval(this.timeoutCounter);
             this.timeoutCounter = setInterval(() => {
                 this.counter--;
-                if (this.$refs.videoPlayer.$player.isBuffering() || this.currentTime < this.video.duration - 1) {
+                if (this.$refs.videoPlayer.$player.isBuffering() || this.currentTime < this.video.duration - 2) {
                     this.dismiss();
                     return;
                 }
