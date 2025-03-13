@@ -18,10 +18,16 @@ export default {
     components: {
         ModalComponent,
     },
+    props: {
+        index: {
+            type: Number,
+            default: 0,
+        },
+    },
     emits: ["created", "close"],
     data() {
         return {
-            playlistName: "New Playlist " + Math.floor(Math.random() * 1000),
+            playlistName: "New Playlist " + this.index,
             show: true,
         };
     },

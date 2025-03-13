@@ -21,6 +21,7 @@
     </ModalComponent>
     <CreatePlaylistModal
         v-if="showCreatePlaylistModal"
+        :index="playlists.length + 1"
         @close="showCreatePlaylistModal = false"
         @created="addCreatedPlaylist"
     />
