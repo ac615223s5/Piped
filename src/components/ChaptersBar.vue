@@ -102,7 +102,7 @@ defineEmits(["seek"]);
     @apply w-full h-full;
 }
 .chapter-vertical {
-    @apply cursor-pointer self-center p-2.5;
+    @apply cursor-pointer self-center p-1;
 }
 .chapter-vertical img {
     @apply w-3/10 h-3/10;
