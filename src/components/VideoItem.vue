@@ -96,7 +96,7 @@
                     v-if="admin"
                     ref="removeButton"
                     :title="$t('actions.remove_from_playlist')"
-                    @click="showConfirmRemove = true"
+                    @click="removeVideo(item.url.substr(-11))"
                 >
                     <i class="i-fa6-solid:circle-minus" />
                 </button>
