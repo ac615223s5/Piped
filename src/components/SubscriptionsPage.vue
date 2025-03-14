@@ -43,6 +43,9 @@
     <br />
     <hr />
     <div class="w-full flex flex-wrap">
+        <button class="btn mx-1" @click="showGroupTable = true">
+            <i class="i-fa6-solid:pen" />
+        </button>
         <button
             v-for="group in channelGroups"
             :key="group.groupName"
@@ -69,7 +72,7 @@
     <br />
     <hr />
     <!-- Subscriptions card list -->
-    <div class="xl:grid xl:grid-cols-5 <md:flex-wrap">
+    <div v-if="!showGroupTable" class="xl:grid xl:grid-cols-5 <md:flex-wrap">
         <!-- channel info card -->
         <div
             v-for="subscription in filteredSubscriptions"
@@ -88,6 +91,34 @@
             />
         </div>
     </div>
+
+    <table v-if="showGroupTable">
+        <tr>
+            <th class="size-fit">Channel</th>
+            <th
+                v-for="group in channelGroups.slice(1)"
+                :key="group.groupName"
+                class="px-0.5"
+                v-text="group.groupName"
+            ></th>
+        </tr>
+        <tr v-for="subscription in subscriptions" :key="subscription.name" class="items-center">
+            <td>
+                <a :href="subscription.url" target="_blank" class="flex grow items-center overflow-hidden">
+                    <img :src="subscription.avatar" class="h-8 w-8 rounded-full" />
+                    <span class="ml-2">{{ subscription.name }}</span>
+                </a>
+            </td>
+            <td v-for="group in channelGroups.slice(1)" :key="group.name">
+                <input
+                    type="checkbox"
+                    class="checkbox ml-3"
+                    :checked="group.channels.includes(subscription.url.substr(-24))"
+                    @change="checkedChange(group, subscription)"
+                />
+            </td>
+        </tr>
+    </table>
     <br />
 
     <CreateGroupModal
@@ -112,7 +143,7 @@
                         type="checkbox"
                         class="checkbox"
                         :checked="selectedGroup.channels.includes(subscription.url.substr(-24))"
-                        @change="checkedChange(subscription)"
+                        @change="checkedChange(selectedGroup, subscription)"
                     />
                 </div>
                 <hr />
@@ -136,6 +167,7 @@ export default {
                 channels: [],
             },
             channelGroups: [],
+            showGroupTable: false,
             showCreateGroupModal: false,
             showEditGroupModal: false,
             editedGroupName: "",
@@ -208,6 +240,7 @@ export default {
             this.download(json, "subscriptions.json", "application/json");
         },
         selectGroup(group) {
+            this.showGroupTable = false;
             this.selectedGroup = group;
             this.editedGroupName = group.groupName;
         },
@@ -244,12 +277,12 @@ export default {
             this.selectedGroup = this.channelGroups[0] || {};
             this.groupToDelete = null;
         },
-        checkedChange(subscription) {
+        checkedChange(group, subscription) {
             const channelId = subscription.url.substr(-24);
-            this.selectedGroup.channels = this.selectedGroup.channels.includes(channelId)
-                ? this.selectedGroup.channels.filter(channel => channel != channelId)
-                : this.selectedGroup.channels.concat(channelId);
-            this.createOrUpdateChannelGroup(this.selectedGroup);
+            group.channels = group.channels.includes(channelId)
+                ? group.channels.filter(channel => channel != channelId)
+                : group.channels.concat(channelId);
+            this.createOrUpdateChannelGroup(group);
         },
         async importGroupsHandler() {
             const files = this.$refs.fileSelector.files;
