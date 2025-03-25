@@ -433,7 +433,7 @@ export default {
                     const time = videoEl.currentTime;
                     this.$emit("timeupdate", time);
                     this.updateProgressDatabase(time);
-                    if (this.sponsors && this.sponsors.segments) {
+                    if (this.sponsors && this.sponsors.segments && time != 0) {
                         const segment = this.findCurrentSegment(time);
                         this.inSegment = !!segment;
                         if (segment?.autoskip && (!segment.skipped || this.selectedAutoLoop)) {
