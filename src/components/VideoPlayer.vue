@@ -739,7 +739,7 @@ export default {
             var request = store.get(this.video.id);
             request.onsuccess = function (event) {
                 var video = event.target.result;
-                if (video) {
+                if (video && time != 0) {
                     video.currentTime = time;
                     store.put(video);
                 }
