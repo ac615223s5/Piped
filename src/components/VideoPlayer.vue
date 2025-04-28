@@ -699,6 +699,22 @@ export default {
                     if (this.$route.query.play === "true" && videoEl.paused) {
                         videoEl.play();
                     }
+                    const seekbar = this.$refs.container.querySelector(".shaka-seek-bar");
+                    const array = ["to right"];
+                    for (const chapter of this.video.chapters) {
+                        const start = (chapter.start / this.video.duration) * 100;
+                        if (start === 0) {
+                            continue;
+                        }
+                        array.push(`transparent ${start}%`);
+                        array.push(`black ${start}%`);
+                        array.push(`black calc(${start}% + 1px)`);
+                        array.push(`transparent calc(${start}% + 1px)`);
+                    }
+                    seekbar.style.background = `linear-gradient(${array.join(",")})`;
+                    seekbar.addEventListener("mouseup", () => {
+                        this.$refs.videoEl.focus();
+                    });
                 })
                 .catch(e => {
                     console.error(e);
@@ -708,24 +724,6 @@ export default {
             // expand the player to fullscreen when the fullscreen query equals true
             if (this.$route.query.fullscreen === "true" && !this.$ui.getControls().isFullScreenEnabled())
                 this.$ui.getControls().toggleFullScreen();
-
-            const seekbar = this.$refs.container.querySelector(".shaka-seek-bar");
-            const array = ["to right"];
-            for (const chapter of this.video.chapters) {
-                const start = (chapter.start / this.video.duration) * 100;
-                if (start === 0) {
-                    continue;
-                }
-                array.push(`transparent ${start}%`);
-                array.push(`black ${start}%`);
-                array.push(`black calc(${start}% + 1px)`);
-                array.push(`transparent calc(${start}% + 1px)`);
-            }
-            seekbar.style.background = `linear-gradient(${array.join(",")})`;
-
-            seekbar.addEventListener("mouseup", () => {
-                this.$refs.videoEl.focus();
-            });
         },
         async updateProgressDatabase(time) {
             // debounce
