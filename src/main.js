@@ -119,7 +119,7 @@ const mixin = {
         apiUrl() {
             return this.getPreferenceString("instance", "https://pipedapi.stellar.afs.ovh");
         },
-        invidiousApiUrl(){
+        invidiousApiUrl() {
             return this.getPreferenceString("invidious", "https://inv.vern.cc");
         },
         authApiUrl() {

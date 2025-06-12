@@ -319,8 +319,7 @@ export default {
                 this.loading = false;
             });
         },
-        searchChannel(e){
-            console.log(111,e.target.value);
+        searchChannel(e) {
             window.location.href = `${this.invidiousApiUrl()}/search?q=channel%3A${this.channel.id}+${e.target.value}`;
         },
     },
