@@ -54,16 +54,23 @@
 
         <WatchOnButton :link="`https://youtube.com/channel/${channel.id}`" />
 
-        <div class="mx-1 my-2 flex">
+        <div class="mx-1 my-2 flex gap-2">
             <button
                 v-for="(tab, index) in tabs"
                 :key="tab.name"
-                class="btn mr-2"
+                class="btn"
                 :class="{ active: selectedTab == index }"
                 @click="loadTab(index)"
             >
                 <span v-text="tab.translatedName"></span>
             </button>
+            <button class="btn">Play all videos</button>
+            <input class="input" placeholder="search channel" @keyup.enter="searchChannel" />
+            <select v-if="selectedTab !== 3" v-model="sort" class="select" @change="sortVideos">
+                <option>newest</option>
+                <option>oldest</option>
+                <option>popular</option>
+            </select>
         </div>
 
         <hr />
@@ -108,6 +115,8 @@ export default {
             selectedTab: 0,
             contentItems: [],
             showGroupModal: false,
+            sort: "newest",
+            sortedNextpage: {},
         };
     },
     mounted() {
@@ -148,11 +157,13 @@ export default {
                         this.fetchDeArrowContent(this.channel.relatedStreams);
                         this.tabs.push({
                             translatedName: this.$t("video.videos"),
+                            contentSorted: {},
                         });
                         const tabQuery = this.$route.query.tab;
                         for (let i = 0; i < this.channel.tabs.length; i++) {
                             let tab = this.channel.tabs[i];
                             tab.translatedName = this.getTranslatedTabName(tab.name);
+                            tab.contentSorted = {};
                             this.tabs.push(tab);
                             if (tab.name === tabQuery) this.loadTab(i + 1);
                         }
@@ -163,13 +174,16 @@ export default {
             if (
                 this.loading ||
                 !this.channel ||
-                !this.channel.nextpage ||
-                (this.selectedTab != 0 && !this.tabs[this.selectedTab].tabNextPage)
+                (this.sort !== "newest" && this.sortedNextpage[this.selectedTab + this.sort] === "end") ||
+                (this.sort === "newest" &&
+                    (!this.channel.nextpage || (this.selectedTab != 0 && !this.tabs[this.selectedTab].tabNextPage)))
             )
                 return;
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - window.innerHeight) {
                 this.loading = true;
-                if (this.selectedTab == 0) {
+                if (this.sort !== "newest") {
+                    this.fetchSortedNextPage();
+                } else if (this.selectedTab == 0) {
                     this.fetchChannelNextPage();
                 } else {
                     this.fetchChannelTabNextPage();
@@ -194,7 +208,7 @@ export default {
             }).then(json => {
                 this.tabs[this.selectedTab].tabNextPage = json.nextpage;
                 this.loading = false;
-                json.this.contentItems.push(...json.content);
+                this.contentItems.push(...json.content);
                 this.fetchDeArrowContent(json.content);
                 this.tabs[this.selectedTab].content = this.contentItems;
             });
@@ -227,6 +241,7 @@ export default {
         },
         loadTab(index) {
             this.selectedTab = index;
+            this.sort = "newest";
 
             // update the tab query in the url path
             const url = new URL(window.location);
@@ -249,6 +264,64 @@ export default {
                 this.fetchDeArrowContent(tab.content);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
             });
+        },
+        sortVideos() {
+            if (this.sort === "newest") {
+                this.contentItems =
+                    this.selectedTab == 0 ? this.channel.relatedStreams : this.tabs[this.selectedTab].content;
+            } else {
+                if (this.tabs[this.selectedTab].contentSorted[this.sort]) {
+                    this.contentItems = this.tabs[this.selectedTab].contentSorted[this.sort];
+                    return;
+                }
+                this.contentItems = this.tabs[this.selectedTab].contentSorted[this.sort] = [];
+                this.fetchSortedNextPage();
+            }
+        },
+        fetchSortedNextPage() {
+            let continuation = this.sortedNextpage[this.selectedTab + this.sort];
+            let api = this.tabs[this.selectedTab].name;
+            if (this.selectedTab === 0) {
+                api = "videos";
+            } else if (api === "livestreams") {
+                api = "streams";
+            }
+            api = `${this.invidiousApiUrl()}/api/v1/channels/${this.channel.id}/${api}?sort_by=${this.sort}`;
+            if (continuation) {
+                api += `&continuation=${continuation}`;
+            }
+            this.fetchJson(api).then(data => {
+                let videos = data.videos;
+                videos = videos.map(video => {
+                    return {
+                        url: `/watch?v=${video.videoId}`,
+                        type: "stream",
+                        title: video.title,
+                        thumbnail: `https://pipedproxy.stellar.afs.ovh/vi/${video.videoId}/hqdefault.jpg?host=i.ytimg.com`,
+                        uploaderName: video.author,
+                        uploaderUrl: video.authorUrl,
+                        // uploaderAvatar: null,
+                        uploadedDate: video.publishedText,
+                        shortDescription: video.description,
+                        duration: video.lengthSeconds,
+                        views: video.viewCount,
+                        uploaded: video.published * 1000,
+                        uploaderVerified: video.authorVerified,
+                        isShort: this.selectedTab === 1,
+                    };
+                });
+                this.tabs[this.selectedTab].contentSorted[this.sort] = this.contentItems =
+                    this.contentItems.concat(videos);
+                if (data.continuation === undefined) {
+                    data.continuation = "end";
+                }
+                this.sortedNextpage[this.selectedTab + this.sort] = data.continuation;
+                this.loading = false;
+            });
+        },
+        searchChannel(e){
+            console.log(111,e.target.value);
+            window.location.href = `${this.invidiousApiUrl()}/search?q=channel%3A${this.channel.id}+${e.target.value}`;
         },
     },
 };

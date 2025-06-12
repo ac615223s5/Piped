@@ -298,8 +298,12 @@
                         <p v-t="'comment.disabled'" class="mt-8 text-center"></p>
                     </div>
                     <div v-else ref="comments" class="">
+                        <select v-model="commentSort" class="select" @change="sortComments">
+                            <option>top</option>
+                            <option>new</option>
+                        </select>
                         <CommentItem
-                            v-for="comment in comments.comments"
+                            v-for="comment in shownComments.comments"
                             :key="comment.commentId"
                             :comment="comment"
                             :uploader="video.uploader"
@@ -387,10 +391,13 @@ export default {
             selectedAutoLoop: false,
             selectedAutoPlay: null,
             showComments: true,
+            commentSort: "top",
             showDesc: false,
             showRecs: true,
             showChapters: true,
+            shownComments: null,
             comments: null,
+            commentsNew: null,
             subscribed: false,
             channelId: null,
             active: true,
@@ -574,6 +581,57 @@ export default {
                 this.fetchComments();
             }
         },
+        sortComments() {
+            if (this.commentSort === "new") {
+                if (!this.commentsNew) {
+                    this.commentsNew = { comments: [] };
+                    this.fetchNewComments();
+                }
+                this.shownComments = this.commentsNew;
+            } else {
+                this.shownComments = this.comments;
+            }
+        },
+        fetchNewComments() {
+            let api = `${this.invidiousApiUrl()}/api/v1/comments/${this.getVideoId()}/?sort_by=new`;
+            if (this.commentsNew.nextpage?.id) {
+                api += `&continuation=${this.commentsNew.nextpage.id}`;
+            }
+            this.fetchJson(api).then(data => {
+                let comments = data.comments;
+                comments = comments.map(comment => {
+                    return {
+                        author: comment.author,
+                        thumbnail: comment.authorThumbnails[0].url,
+                        commentId: comment.commentId,
+                        commentText: comment.content,
+                        commentedTime: comment.publishedText,
+                        commentorUrl: comment.authorUrl,
+                        repliesPage: comment.replies? {
+                            url: "https://www.youtube.com/watch?v=" + this.getVideoId(),
+                            id: comment.replies.continuation,
+                        }: null,
+                        replyCount: comment.replies ? comment.replies.replyCount : 0,
+                        likeCount: comment.likeCount,
+                        hearted: comment.creatorHeart != undefined,
+                        pinned: comment.isPinned,
+                        verified: comment.verified,
+                        creatorReplied: false, //not supported
+                        channelOwner: comment.authorIsChannelOwner,
+                    };
+                });
+                this.commentsNew.comments = this.commentsNew.comments.concat(comments);
+                this.commentsNew.nextpage = {
+                    nextpage: "https://www.youtube.com/watch?v=" + this.getVideoId(),
+                    id: data.continuation,
+                    commentCount: data.commentCount,
+                };
+                if (data.continuation === undefined) {
+                    this.commentsNew.nextpage = "end";
+                }
+                this.loading = false;
+            });
+        },
         fetchComments() {
             return this.fetchJson(this.apiUrl() + "/comments/" + this.getVideoId());
         },
@@ -643,7 +701,7 @@ export default {
                 this.fetchSponsors().then(data => (this.sponsors = data));
         },
         async getComments() {
-            this.comments = await this.fetchComments();
+            this.shownComments = this.comments = await this.fetchComments();
         },
         async fetchSubscribedStatus() {
             if (!this.channelId) return;
@@ -688,6 +746,12 @@ export default {
             if (this.loading || !this.comments || !this.comments.nextpage) return;
             if (window.innerHeight + window.scrollY >= this.$refs.comments?.offsetHeight - window.innerHeight) {
                 this.loading = true;
+                if (this.commentSort === "new") {
+                    if (this.commentsNew.nextpage !== "end") {
+                        this.fetchNewComments();
+                    }
+                    return;
+                }
                 this.fetchJson(this.apiUrl() + "/nextpage/comments/" + this.getVideoId(), {
                     nextpage: this.comments.nextpage,
                 }).then(json => {
