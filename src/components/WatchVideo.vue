@@ -609,10 +609,10 @@ export default {
                         commentedTime: comment.publishedText,
                         commentorUrl: comment.authorUrl,
                         repliesPage: comment.replies
-                            ? {
+                            ? JSON.stringify({
                                   url: "https://www.youtube.com/watch?v=" + this.getVideoId(),
                                   id: comment.replies.continuation,
-                              }
+                              })
                             : null,
                         replyCount: comment.replies ? comment.replies.replyCount : 0,
                         likeCount: comment.likeCount,
