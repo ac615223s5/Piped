@@ -585,6 +585,7 @@ export default {
             if (this.commentSort === "new") {
                 if (!this.commentsNew) {
                     this.commentsNew = { comments: [] };
+                    this.loading = true;
                     this.fetchNewComments();
                 }
                 this.shownComments = this.commentsNew;
