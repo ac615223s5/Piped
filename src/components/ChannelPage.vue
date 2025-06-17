@@ -64,7 +64,9 @@
             >
                 <span v-text="tab.translatedName"></span>
             </button>
-            <button class="btn">Play all videos</button>
+            <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
+                <button class="btn h-full">Play all videos</button>
+            </router-link>
             <input class="input" placeholder="search channel" @keyup.enter="searchChannel" />
             <select v-if="selectedTab !== 3" v-model="sort" class="select" @change="sortVideos">
                 <option>newest</option>
