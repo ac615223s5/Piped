@@ -85,10 +85,10 @@
                 :title="playlist.name"
                 v-text="playlist.name"
             />
-            <a :href="playlist.uploaderUrl" class="flex items-center">
+            <router-link :to="playlist.uploaderUrl" class="flex items-center">
                 <img class="h-32px w-32px rounded-full" :src="playlist.uploaderAvatar" />
                 <span class="ml-3 hover:underline" v-text="playlist.uploader" />
-            </a>
+            </router-link>
         </router-link>
     </div>
     <br />
