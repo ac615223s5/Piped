@@ -430,6 +430,9 @@ export default {
                         Math.max(this.getPreferenceNumber("bufferGoal", 10), 10),
                     );
                     localPlayer.configure("streaming.bufferBehind", 300);
+                    // shaka clamps seeks past the end to duration - durationBackoff, which defaults
+                    // to a whole second and would leave the video just short of finishing
+                    localPlayer.configure("streaming.durationBackoff", 0.01);
 
                     this.setPlayerAttrs(localPlayer, videoEl, uri, mime, this.$shaka);
                 });
