@@ -105,12 +105,16 @@ export default {
         selectedAutoLoop: Boolean,
         isEmbed: Boolean,
     },
-    emits: ["timeupdate", "ended", "navigateNext"],
+    emits: ["timeupdate", "ended", "navigateNext", "streamsRefreshed"],
     data() {
         return {
             lastUpdate: new Date().getTime(),
             initialSeekComplete: false,
             destroying: false,
+            refreshingStreams: false,
+            lastStreamRefresh: 0,
+            resumeTime: null,
+            resumePlaying: false,
             inSegment: false,
             isHoveringTimebar: false,
             showSpeedModal: false,
@@ -311,6 +315,10 @@ export default {
     },
     methods: {
         async loadVideo() {
+            // the page may have sat idle for long enough that the urls we were
+            // handed are already dead, so grab fresh ones before loading them
+            if (!this.refreshingStreams && this.streamsExpired() && (await this.refreshStreams())) return;
+
             this.updateSponsors();
 
             const component = this;
@@ -395,13 +403,18 @@ export default {
 
                     const localPlayer = new this.$shaka.Player();
                     await localPlayer.attach(videoEl);
-                    const proxyURL = new URL(component.video.proxyUrl);
-                    let proxyPath = proxyURL.pathname;
-                    if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
-                        proxyPath = proxyPath.substring(0, proxyPath.length - 1);
-                    }
+
+                    localPlayer.addEventListener("error", event => this.onPlayerError(event.detail));
 
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
+                        // read the proxy off the video every time, since refreshing
+                        // the streams can hand us a different one
+                        const proxyURL = new URL(component.video.proxyUrl);
+                        let proxyPath = proxyURL.pathname;
+                        if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
+                            proxyPath = proxyPath.substring(0, proxyPath.length - 1);
+                        }
+
                         const uri = request.uris[0];
                         var url = new URL(uri);
                         const headers = request.headers;
@@ -455,6 +468,12 @@ export default {
                     }
                 });
 
+                videoEl.addEventListener("play", () => {
+                    // a pause that outlives the stream urls would otherwise resume
+                    // into a buffer that can never be refilled
+                    if (this.streamsExpired()) this.refreshStreams();
+                });
+
                 videoEl.addEventListener("volumechange", () => {
                     this.setPreference("volume", videoEl.volume, true);
                 });
@@ -470,6 +489,71 @@ export default {
                 });
             }
             //TODO: Add sponsors on seekbar: https://github.com/ajayyy/SponsorBlock/blob/e39de9fd852adb9196e0358ed827ad38d9933e29/src/js-components/previewBar.ts#L12
+        },
+        // youtube signs its urls with an expiry a few hours out, passed either as a
+        // query param on the stream urls or as a path segment on the manifests
+        streamsExpired(margin = 60) {
+            const urls = [
+                this.video.hls,
+                this.video.dash,
+                this.video.audioStreams?.[0]?.url,
+                this.video.videoStreams?.[0]?.url,
+            ];
+
+            let expiry = null;
+            for (const url of urls) {
+                const match = /[?&]expire=(\d+)|\/expire\/(\d+)/.exec(url ?? "");
+                if (!match) continue;
+                const timestamp = Number(match[1] ?? match[2]);
+                if (expiry === null || timestamp < expiry) expiry = timestamp;
+            }
+
+            return expiry !== null && Date.now() / 1000 >= expiry - margin;
+        },
+        // Refetches the streams and reloads the player with them, keeping the
+        // current position. Resolves to whether playback is being recovered.
+        async refreshStreams() {
+            // an in flight refresh is already taking care of it
+            if (this.refreshingStreams) return true;
+            // a failing instance shouldn't turn into a refetch loop
+            if (Date.now() - this.lastStreamRefresh < 10000) return false;
+
+            this.refreshingStreams = true;
+            this.lastStreamRefresh = Date.now();
+
+            try {
+                const data = await this.fetchJson(this.apiUrl() + "/streams/" + this.video.id);
+                if (!data || data.error) return false;
+
+                const videoEl = this.$refs.videoEl;
+                if (videoEl?.currentTime > 0) {
+                    this.resumeTime = videoEl.currentTime;
+                    this.resumePlaying = !videoEl.paused;
+                }
+
+                // the parent owns the video, let it swap the urls in before we reload
+                this.$emit("streamsRefreshed", data);
+
+                await this.loadVideo();
+                this.error = 0;
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            } finally {
+                this.refreshingStreams = false;
+            }
+        },
+        async onPlayerError(error) {
+            const Code = this.$shaka.util.Error.Code;
+            // reloading the player aborts the load in progress, which isn't a failure
+            if (error?.code === Code.LOAD_INTERRUPTED || error?.code === Code.OPERATION_ABORTED) return;
+
+            console.error(error);
+            // expired urls surface mid playback as network failures, and retrying
+            // them is pointless - we need new ones
+            if (error?.category === this.$shaka.util.Error.Category.NETWORK && (await this.refreshStreams())) return;
+            this.error = error?.code ?? 0;
         },
         findCurrentSegment(time) {
             return this.sponsors?.segments?.find(s => time >= s.segment[0] && time < s.segment[1]);
@@ -581,7 +665,11 @@ export default {
                 streaming: {
                     segmentPrefetchLimit: prefetchLimit,
                     retryParameters: {
-                        maxAttempts: Infinity,
+                        // shaka grows the delay between attempts by backoffFactor
+                        // without any upper bound, so retrying forever means a dead
+                        // url is retried hours apart and never reported as an error.
+                        // Give up after a few tries and let onPlayerError recover.
+                        maxAttempts: 6,
                         baseDelay: 250,
                         backoffFactor: 1.5,
                     },
@@ -597,7 +685,12 @@ export default {
 
             var startTime = 0;
 
-            if (time) {
+            if (this.resumeTime !== null) {
+                // reloading after a stream refresh, pick up where we left off
+                startTime = this.resumeTime;
+                this.resumeTime = null;
+                this.initialSeekComplete = true;
+            } else if (time) {
                 startTime = parseTimeParam(time);
                 this.initialSeekComplete = true;
             } else if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
@@ -627,6 +720,8 @@ export default {
             player
                 .load(uri, startTime, mime)
                 .then(() => {
+                    this.error = 0;
+
                     // Set the audio language
                     let lang = "en";
                     const prefLang = this.getPreferenceString("hl", "en").substr(0, 2);
@@ -705,9 +800,10 @@ export default {
                             this.$player.selectTextTrack(textTracks[subtitleIdx]);
                         }
                     }
-                    if (this.$route.query.play === "true" && videoEl.paused) {
+                    if ((this.resumePlaying || this.$route.query.play === "true") && videoEl.paused) {
                         videoEl.play();
                     }
+                    this.resumePlaying = false;
                     const seekbar = this.$refs.container.querySelector(".shaka-seek-bar");
                     const array = ["to right"];
                     for (const chapter of this.video.chapters) {
@@ -725,10 +821,7 @@ export default {
                         this.$refs.videoEl.focus();
                     });
                 })
-                .catch(e => {
-                    console.error(e);
-                    this.error = e.code;
-                });
+                .catch(e => this.onPlayerError(e));
 
             // expand the player to fullscreen when the fullscreen query equals true
             if (this.$route.query.fullscreen === "true" && !this.$ui.getControls().isFullScreenEnabled())

@@ -7,6 +7,7 @@
             :selected-auto-play="false"
             :selected-auto-loop="selectedAutoLoop"
             :is-embed="isEmbed"
+            @streams-refreshed="onStreamsRefreshed"
         />
     </div>
     <div id="theaterModeSpot" class="-mx-5"></div>
@@ -32,6 +33,7 @@
                                     @timeupdate="onTimeUpdate"
                                     @ended="onVideoEnded"
                                     @navigate-next="navigateNext"
+                                    @streams-refreshed="onStreamsRefreshed"
                                 />
                             </keep-alive>
                             <button
@@ -640,6 +642,19 @@ export default {
         },
         onChange() {
             this.setPreference("autoplay", this.selectedAutoPlay, true);
+        },
+        // the player refetched the streams because the signed urls it was given
+        // had expired, so take the new ones without disturbing the rest of the page
+        onStreamsRefreshed(data) {
+            Object.assign(this.video, {
+                audioStreams: data.audioStreams,
+                videoStreams: data.videoStreams,
+                hls: data.hls,
+                dash: data.dash,
+                proxyUrl: data.proxyUrl,
+                subtitles: data.subtitles,
+                previewFrames: data.previewFrames,
+            });
         },
         async getVideoData() {
             await this.fetchVideo()

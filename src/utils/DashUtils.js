@@ -17,15 +17,17 @@ function generate_xmljs_json_from_data(VideoFormatArray, VideoLength) {
         "?xml": {
             _version: "1.0",
             _encoding: "utf-8",
-            MPD: {
-                _xmlns: "urn:mpeg:dash:schema:mpd:2011",
-                _profiles: "urn:mpeg:dash:profile:full:2011",
-                _minBufferTime: "PT1.5S",
-                _type: "static",
-                _mediaPresentationDuration: `PT${VideoLength}S`,
-                Period: {
-                    AdaptationSet: generate_adaptation_set(VideoFormatArray),
-                },
+        },
+        // fast-xml-parser >= 5 drops anything nested inside the "?xml" processing
+        // instruction, so the MPD has to be a sibling of it
+        MPD: {
+            _xmlns: "urn:mpeg:dash:schema:mpd:2011",
+            _profiles: "urn:mpeg:dash:profile:full:2011",
+            _minBufferTime: "PT1.5S",
+            _type: "static",
+            _mediaPresentationDuration: `PT${VideoLength}S`,
+            Period: {
+                AdaptationSet: generate_adaptation_set(VideoFormatArray),
             },
         },
     };
